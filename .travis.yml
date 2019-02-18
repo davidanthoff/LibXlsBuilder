@@ -1,0 +1,39 @@
+language: julia
+os:
+  - linux
+julia:
+  - 1.0
+notifications:
+  email: false
+git:
+  depth: 99999999
+cache:
+  timeout: 1000
+  directories:
+    - downloads
+env:
+  global:
+    - BINARYBUILDER_DOWNLOADS_CACHE=downloads
+    - BINARYBUILDER_AUTOMATIC_APPLE=false
+sudo: required
+
+# Before anything else, get the latest versions of things
+before_script:
+  - julia -e 'using Pkg; pkg"add BinaryProvider"; pkg"add BinaryBuilder#master"; Pkg.build()'
+
+script:
+  - julia build_tarballs.jl
+
+
+deploy:
+    provider: releases
+    api_key:
+        # Note; this api_key is only valid for davidanthoff/LibXlsBuilder; you need
+        # to make your own: https://docs.travis-ci.com/user/deployment/releases/
+        secure: bwr8fJAEzT4OdTplV/Jed1vOsgg+lC1uWt4XkVMtdnrwEzjKwWmafey6JGXKH7MK7+gnlkHaS1bIZmMK09XbLBysUMnDhIaW/JsjlSXQHt0DG6VdUOkXhKjg79T4LcEiPf6Q1vEGPyI4ZJJJ2lWStkchd+uOq1A2etx4apP6X89oGutzdR0eAQzYtko9zCBI5wn7vvxzRY7aVzDGNRkzufgoEEnbtpTgsOz0wiGUpltjMtw+yXZup+hBHUh2RAgWb58H4i0jVdvCsxcqKJAsQ9yTipfBeNknOHwNEO+cMfldxv0Ex8iemFWpn3S6Sf4lXS0jaY7JECPtxMmoQjLOCBVzetNrZCKIVL/IpLI5CWMwIrnktFPFnk4yBHzDY6o4ZTn6Xl2aiMO4p18g4DE3ORiS97dWAlzjhJ7GPqvBl1WaVywqK4ttg+Kbp4ipjLH0Cf6eUoqdJ2+36idVLszft1TH0Yo9uPfHzsHZ6CdtemrmnHEWCgLz7GgWncnJDAgwlENeG3TwsFal+3b3Df0IMP8lidpe7XNtx5KFP6RIT+9OuwoNcA7SzWlfhD4zidtaO0jZTzA9g2ke+RRZX13WOEeZVg5fiUVRD3hZZ437MKDXHJ5xCfLZ7SxxSQVZ1rUNMcvFHUIyzhlKWtIUIdcDmurfvn9I7jw9Kp2rKgT7FYQ=
+    file_glob: true
+    file: products/*
+    skip_cleanup: true
+    on:
+        repo: davidanthoff/LibXlsBuilder
+        tags: true
